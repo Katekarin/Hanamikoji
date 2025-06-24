@@ -1,0 +1,265 @@
+/* Reset i ogólne ustawienia */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+body {
+  background-color: #e27012;
+  padding: 1%;
+}
+
+/* Układ ogólny graczy */
+#player1,
+#player2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 5% auto;
+  padding: 1%;
+  border: 2px solid #999;
+  background-color: #fc0075;
+  width: 90vw;
+  height: 120px;
+}
+
+.hiddenCards {
+  display: flex;
+  width: 60px;
+  height: 90px;
+  background-color: #494949;
+  border: 1px solid #000;
+}
+
+#player1 > .hiddenCards {
+  position: relative;
+  top: 50px;
+}
+
+#player2 > .hiddenCards {
+  position: relative;
+  top: -50px;
+}
+
+/* Akcje */
+.actions {
+  display: flex;
+  left:-20px;
+  gap: 10px;
+  margin: 10px 0 10px -150px;
+  width: 27.5%;
+}
+
+.actions > .action {
+  width: 75px;
+  height: 75px;
+  background-color: #f0c040;
+  border: 2px solid #444;
+  text-align: center;
+  line-height: 75px;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.actions > .action:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 10px #0005;
+  cursor: pointer;
+}
+
+/* Centrum */
+#center {
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  border: 1px dotted #000;
+  padding: 20px 0;
+}
+
+/* Gejsze */
+#geishe {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin: 20px 0;
+  padding: 10px;
+  width: 80%;
+  background-color: #723700;
+  border: 2px solid #492300;
+}
+
+.geisha {
+  border: 2px solid #333;
+  padding: 10px;
+  width: 11%;
+  text-align: center;
+  background-color: #fff;
+}
+
+.geisha > div {
+  margin: 5px 0;
+  min-height: 30px;
+  border: 1px dashed #aaa;
+  padding: 4px;
+}
+
+/* Talia i odrzutki */
+#deck,
+#discardPile {
+  display: inline-block;
+  width: 100px;
+  height: 150px;
+  border: 2px solid #555;
+  background-color: #ddd;
+  margin: 10px;
+  text-align: center;
+  line-height: 150px;
+  font-weight: bold;
+}
+
+#deckCounter {
+  font-size: 1.5em;
+}
+
+/* Karty */
+.cards {
+  display: flex;
+  gap: 8px;
+  min-height: 90px;
+}
+
+.card {
+  width: 60px;
+  height: 90px;
+  background-color: #fff;
+  border: 1px solid #000;
+  text-align: center;
+  line-height: 90px;
+  font-weight: bold;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 8px #0005;
+  cursor: pointer;
+}
+
+/* Punkty */
+.points {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+/* Przycisk Koniec tury */
+#endTurn {
+  text-align: center;
+  margin: 30px 0;
+}
+
+#endTurn button {
+  background-color: #c00;
+  color: #fff;
+  padding: 10px 25px;
+  font-size: 1em;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+#endTurn button:hover {
+  background-color: #900;
+}
+
+.activePlayer {
+  outline: 4px solid pink;
+}
+
+.card.selectable {
+  outline: 3px solid #00f;
+}
+
+#discardPile .card {
+  width: 60px;
+  height: 90px;
+  background-color: #333;
+  border: 1px solid #000;
+  margin: 2px;
+  display: inline-block;
+}
+
+#geishe {
+  display: flex;
+  gap: 10px; /* odstęp między gejszami */
+}
+
+.geisha {
+  position: relative;
+  width: 120px; /* dostosuj szerokość */
+  height: 180px; /* dostosuj wysokość */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #fefefe;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.geisha-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background-color: #fff;
+  padding: 20px;
+  display: flex;
+  gap: 20px;
+  border-radius: 8px;
+}
+
+.stackChoice {
+  border: 2px solid #999;
+  padding: 10px;
+  cursor: pointer;
+  background-color: #eee;
+}
+
+.stackChoice:hover {
+  border-color: #333;
+}
+
+.present {
+  width: 20px;
+  height: 30px;
+  background-color: pink;
+  border: 1px solid #333;
+  display: inline-block;
+  margin: 2px;
+}
+

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Hanamikoji</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="table">
+
+  <!-- Gracz 1 -->
+  <div id="player1" class="player">
+    <div class="hiddenCards"></div>
+
+    <div class="actions">
+      <div class="action action1">Oddaj</div>
+      <div class="action action2">Odrzuć</div>
+      <div class="action action3">Podziel</div>
+      <div class="action action4">podział</div>
+    </div>
+
+    <div class="cards">
+      <!-- Przykładowe karty -->
+    </div>
+
+    <div class="points">0 pkt</div>
+  </div>
+
+  <!-- Centrum stołu -->
+  <div id="center">
+
+    <!-- Talia kart -->
+    <div id="deck">
+      <div id="deckCounter">deck counter</div>
+    </div>
+
+    <!-- Gejsze -->
+    <div id="geishe">
+      <!-- 7 gejsz -->
+      <div class="geisha" id="geisha1">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">2</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha2">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">2</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha3">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">2</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha4">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">3</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha5">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">3</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha6">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">4</div>
+        <div class="presentsP2"></div>
+      </div>
+      <div class="geisha" id="geisha7">
+        <div class="presentsP1"></div>
+        <div class="presentsPoints">5</div>
+        <div class="presentsP2"></div>
+      </div>
+    </div>
+
+    <!-- Stos odrzuconych kart -->
+    <div id="discardPile">Odrzut</div>
+  </div>
+
+  <div id="endTurn">
+  <button onclick="endTurn()">Zakończ turę</button>
+</div>
+
+
+  <!-- Gracz 2 -->
+  <div id="player2" class="player">
+    <div class="hiddenCards"></div>
+
+    <div class="actions">
+      <div class="action action1">Zachowaj 1</div>
+      <div class="action action2">Odrzuć 1</div>
+      <div class="action action3">Podział 2/2</div>
+      <div class="action action4">Podział 3/1</div>
+    </div>
+
+
+    <div class="cards">
+
+    </div>
+
+    <div class="points">0 pkt</div>
+  </div>
+
+</div>
+
+<div id="modal" class="modal hidden">
+  <div class="modal-content" id="choiceZone"></div>
+</div>
+
+</body>
+<script src="datasets.js"></script>
+<script src="scripts.js"></script>
+</html>
