@@ -1,8 +1,3 @@
-let tura = {
-    runda: 0,
-    active:player1
-}
-
 function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -18,9 +13,11 @@ function renderCardToHand(playerId, card) {
   const cardDiv = document.createElement("div");
   cardDiv.classList.add("card");
 
-  // 👁️ Zawartość karty
-  if (card.revealed) {
+  const isActivePlayer = playerId === tura.active.id;
+
+  if (isActivePlayer) {
     cardDiv.textContent = `G${card.geishaId}`;
+    cardDiv.style.backgroundColor = "#f0f0f0";
   } else {
     cardDiv.textContent = "❓";
     cardDiv.style.backgroundColor = "#999";
@@ -28,6 +25,8 @@ function renderCardToHand(playerId, card) {
 
   handDiv.appendChild(cardDiv);
 }
+
+
 
 function updateDeckCounter() {
   const counter = document.getElementById("deckCounter");
@@ -42,13 +41,11 @@ function drawCard(player) {
 
   const drawnCard = deck.shift();
   drawnCard.owner = player.id;
-  drawnCard.revealed = true; // lub false, jeśli ma być zakryta
-
+  drawnCard.revealed = true;
   player.hand.push(drawnCard);
 
   console.log(`${player.id} dobrał kartę Geishy ${drawnCard.geishaId}`);
 
-  // 🔽 Dodaj kartę do HTML
   renderCardToHand(player.id, drawnCard);
 
   updateDeckCounter()
@@ -68,7 +65,6 @@ function selectCards(player, numberToSelect, callback) {
       selected.push(index);
 
       if (selected.length === numberToSelect) {
-        // wyczyść selecty i kliknięcia
         cards.forEach(c => {
           c.classList.remove('selectable');
           c.style.outline = '';
@@ -76,274 +72,139 @@ function selectCards(player, numberToSelect, callback) {
         });
 
         callback(selected.map(i => player.hand[i]));
-      }
-    });
-  });
-}
+      }});});}
 
 function endTurn() {
-  // Zmiana aktywnego gracza
-  tura.active = (tura.active.id === "player1") ? player2 : player1;
+  tura.active = (tura.active === player1) ? player2 : player1;
+
   console.log("Nowa tura. Gracz aktywny:", tura.active.id);
-
-  // Dobranie karty dla nowego aktywnego gracza
+  
   drawCard(tura.active);
+  redrawHand(player1);
+  redrawHand(player2, true);
 
-  // Podświetlenie aktywnego gracza
   updateActivePlayerHighlight();
+
+  const allCardsUsed = player1.hand.length === 0 && player2.hand.length === 0 && deck.length === 0;
+  if (allCardsUsed) {
+    endRound();
+    return;
+  }
+
+  if (isSinglePlayer && tura.active === player2) {
+    setTimeout(botPlayTurn, 500);
+  }
 }
 
-function startGame() {
+
+function startGameSingle(level) {
+  console.log("Start gry single player. Poziom trudności:", level);
+  isSinglePlayer = true;
+  botDifficulty = level;
+  startGame();
+}
+
+
+function startGame(mode) {
   shuffle(deck);
 
-  // Usuwamy 1 kartę z talii (zakrytą)
   const hiddenCard = deck.shift();
   hiddenCard.revealed = false;
   hiddenCard.owner = null;
   console.log("Usunięto jedną zakrytą kartę z gry.");
 
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 7; i++) {
     drawCard(player1);
     drawCard(player2);
   }
 
   tura.runda = 1;
-  tura.active = player1;
+
+  if (mode === 'singlePlayer') {
+    player1.isBot = true;
+    player2.isBot = false;
+    tura.active = player1;
+  } else {
+    player1.isBot = false;
+    player2.isBot = false;
+    tura.active = player1;
+  }
 
   updateDeckCounter();
-  updateActivePlayerHighlight()
+  updateActivePlayerHighlight();
+
+  if (tura.active.isBot) {
+    setTimeout(() => botTurn(), 1000);
+  } else {
+    console.log("Rozpoczęto grę. Gracz 1 zaczyna.");
+  }
+  console.log("Talia start nowej rundy:", deck.length);
+console.log("Ręka P1:", player1.hand.length);
+console.log("Ręka P2:", player2.hand.length);
+
 }
 
-function redrawHand(player) {
-  const handDiv = document.querySelector(`#${player.id} .cards`);
-  handDiv.innerHTML = '';
-  player.hand.forEach(card => renderCardToHand(player.id, card));
+
+function redrawHand(player, hideCards = false) {
+  const handContainer = document.querySelector(`#${player.id} .cards`);
+  handContainer.innerHTML = "";
+
+  player.hand.forEach(card => {
+    const cardDiv = document.createElement("div");
+    cardDiv.classList.add("card");
+
+    if (hideCards && player.id === "player2") {
+      cardDiv.textContent = "❓";
+      cardDiv.style.backgroundColor = "#999";
+    } else {
+      cardDiv.textContent = `G${card.geishaId}`;
+    }
+
+    handContainer.appendChild(cardDiv);
+  });
 }
+
 
 function assignCardToGeisha(card, playerId) {
+  const geisha = geishas.find(g => g.id === card.geishaId);
+  if (!geisha) return;
+
+  if (!geisha.presents) {
+    geisha.presents = { player1: [], player2: [] };
+  }
+
+  geisha.presents[playerId].push(card);
+
   const geishaDiv = document.getElementById(`geisha${card.geishaId}`);
   if (!geishaDiv) return;
 
   const targetZone = geishaDiv.querySelector(playerId === "player1" ? ".presentsP1" : ".presentsP2");
   const present = document.createElement("div");
   present.classList.add("present");
-  present.textContent = "🎁"; // lub `G${card.geishaId}` jeśli chcesz to pokazać
+  present.textContent = "🎁";
 
   targetZone.appendChild(present);
 }
 
-function handleKeepOne(player) {
-  alert("Wybierz jedną kartę, którą chcesz zakryć (przechować).");
+function showModal(container, message) {
+  const modal = document.getElementById("modal");
+  modal.classList.remove("hidden");
+  container.innerHTML = `<h3>${message}</h3>`;
+}
 
-  selectCards(player, 1, (selectedCards) => {
-    const hiddenCard = selectedCards[0];
-    hiddenCard.revealed = false;
+function assignCardsToGeisha(cards, playerId) {
+  cards.forEach(card => assignCardToGeisha(card, playerId));
+}
 
-    const idx = player.hand.indexOf(hiddenCard);
+function removeCardsFromHand(player, cardsToRemove) {
+  cardsToRemove.forEach(card => {
+    const idx = player.hand.indexOf(card);
     if (idx !== -1) player.hand.splice(idx, 1);
-
-    const hiddenZone = document.querySelector(`#${player.id} .hiddenCards`);
-    const cardDiv = document.createElement("div");
-    cardDiv.classList.add("card");
-    cardDiv.textContent = "❓";
-    cardDiv.style.backgroundColor = "#333";
-    hiddenZone.appendChild(cardDiv);
-
-    redrawHand(player);
-  });
-  endTurn()
-}
-
-function handleDiscardTwo(player) {
-  alert("Wybierz 2 karty do odrzucenia.");
-
-  selectCards(player, 2, (selectedCards) => {
-    // Usuń z ręki
-    selectedCards.forEach(card => {
-      const idx = player.hand.indexOf(card);
-      if (idx !== -1) player.hand.splice(idx, 1);
-    });
-
-    // Dodaj zakryte do stosu odrzuconych
-    const discardPile = document.getElementById("discardPile");
-
-    selectedCards.forEach(() => {
-      const cardDiv = document.createElement("div");
-      cardDiv.classList.add("card");
-      discardPile.appendChild(cardDiv);
-    });
-
-    // Odśwież rękę
-    redrawHand(player);
-  });
-  endTurn()
-}
-
-function handleSplitTwoTwo(player) {
-  alert("Wybierz 4 karty do podziału 2/2.");
-
-  selectCards(player, 4, (selectedCards) => {
-    alert("Podziel wybrane 4 karty na dwa stosy po 2 karty.");
-
-    // Pozwól graczowi stworzyć 2 stosy po 2 karty
-    let stack1 = [];
-    let stack2 = [];
-
-    const chooseStack = (remainingCards) => {
-      selectCards({ id: player.id, hand: remainingCards }, 2, (firstStack) => {
-        stack1 = firstStack;
-        stack2 = remainingCards.filter(card => !stack1.includes(card));
-
-        // Usuń z ręki gracza
-        selectedCards.forEach(card => {
-          const idx = player.hand.indexOf(card);
-          if (idx !== -1) player.hand.splice(idx, 1);
-        });
-
-        // Przeciwnik wybiera stos
-        const opponent = (player.id === "player1") ? player2 : player1;
-        alert(`${opponent.id}: wybierz jeden ze stosów`);
-
-        // Pokazanie stosów do wyboru
-        const bothStacks = [stack1, stack2];
-
-        // tymczasowe przetwarzanie (np. przycisków) – uproszczenie:
-        const modal = document.getElementById("modal");
-        const container = document.getElementById("choiceZone");
-        modal.classList.remove("hidden");
-        container.innerHTML = '';
-
-
-        bothStacks.forEach((stack, index) => {
-          const stackDiv = document.createElement("div");
-          stackDiv.classList.add("stackChoice");
-          stack.forEach(card => {
-            const c = document.createElement("div");
-            c.classList.add("card");
-            c.textContent = `G${card.geishaId}`;
-            stackDiv.appendChild(c);
-          });
-
-          stackDiv.addEventListener("click", () => {
-  // Przypisz prezenty do odpowiednich gejsz
-  stack.forEach(card => assignCardToGeisha(card, opponent.id));
-  bothStacks[1 - index].forEach(card => assignCardToGeisha(card, player.id));
-
-  // Zamknij modal
-  modal.classList.add("hidden");
-  container.innerHTML = '';
-
-  // Odśwież ręce (na wypadek gdyby coś jeszcze tam zostało)
-  redrawHand(player);
-  redrawHand(opponent);
-});
-
-
-          container.appendChild(stackDiv);
-        });
-      });
-    };
-
-    chooseStack(selectedCards);
-  });
-  endTurn()
-}
-
-function handleSplitThreeOne(player) {
-  alert("Wybierz 4 karty do podziału 3/1.");
-
-  selectCards(player, 4, (selectedCards) => {
-    alert("Podziel wybrane 4 karty na dwa stosy: 3 i 1.");
-
-    let stack3 = [];
-    let stack1 = [];
-
-    const chooseStack = (remainingCards) => {
-      selectCards({ id: player.id, hand: remainingCards }, 3, (firstStack) => {
-        stack3 = firstStack;
-        stack1 = remainingCards.filter(card => !stack3.includes(card));
-
-        // Usuń z ręki gracza
-        selectedCards.forEach(card => {
-          const idx = player.hand.indexOf(card);
-          if (idx !== -1) player.hand.splice(idx, 1);
-        });
-
-        const opponent = (player.id === "player1") ? player2 : player1;
-        alert(`${opponent.id}: wybierz jeden ze stosów.`);
-
-        const bothStacks = [stack3, stack1];
-
-        const modal = document.getElementById("modal");
-        const container = document.getElementById("choiceZone");
-        modal.classList.remove("hidden");
-        container.innerHTML = '';
-
-        bothStacks.forEach((stack, index) => {
-          const stackDiv = document.createElement("div");
-          stackDiv.classList.add("stackChoice");
-          stack.forEach(card => {
-            const c = document.createElement("div");
-            c.classList.add("card");
-            c.textContent = `G${card.geishaId}`;
-            stackDiv.appendChild(c);
-          });
-
-          stackDiv.addEventListener("click", () => {
-            stack.forEach(card => assignCardToGeisha(card, opponent.id));
-            bothStacks[1 - index].forEach(card => assignCardToGeisha(card, player.id));
-
-            modal.classList.add("hidden");
-            container.innerHTML = '';
-
-            redrawHand(player);
-            redrawHand(opponent);
-          });
-
-          container.appendChild(stackDiv);
-        });
-      });
-    };
-
-    chooseStack(selectedCards);
-  });
-  endTurn()
-}
-
-function handleSplitThreeOne(player) {
-  alert("Wybierz 3 karty, które chcesz rozdzielić (1 oddasz przeciwnikowi, 2 zachowasz).");
-
-  selectCards(player, 3, (selectedCards) => {
-    alert("Wybierz 1 kartę, którą oddasz przeciwnikowi jako prezent.");
-
-    selectCards({ id: player.id, hand: selectedCards }, 1, (opponentCardArray) => {
-      const opponentCard = opponentCardArray[0];
-      const playerCards = selectedCards.filter(card => card !== opponentCard);
-
-      // Usuń wszystkie 3 karty z ręki gracza
-      selectedCards.forEach(card => {
-        const idx = player.hand.indexOf(card);
-        if (idx !== -1) player.hand.splice(idx, 1);
-      });
-
-      // Ustal przeciwnika
-      const opponent = (player.id === "player1") ? player2 : player1;
-
-      // Przypisz karty jako prezenty
-      assignCardToGeisha(opponentCard, opponent.id);
-      playerCards.forEach(card => assignCardToGeisha(card, player.id));
-
-      // Odśwież ręce
-      redrawHand(player);
-      redrawHand(opponent);
-      endTurn()
-    });
   });
 }
 
 function handleAction(player, actionType) {
   if (player.usedActions.includes(actionType)) {
-    alert("Ta akcja została już użyta!");
     return;
   }
 
@@ -365,25 +226,179 @@ function handleAction(player, actionType) {
       handleSplitTwoTwo(player)
       console.log('action3')
       break;
-    case "action4": // Podział 3/1
+    case "action4": // Podział 2/1
       handleSplitThreeOne(player);
       console.log('action4');
       break;
     }
 
-  player.usedActions.push(actionType);
+  player.usedActions.push(actionType);  
+
 }
+
 
 function updateActivePlayerHighlight() {
   document.querySelectorAll('.player').forEach(p => p.classList.remove('activePlayer'));
   document.getElementById(tura.active.id).classList.add('activePlayer');
 }
 
-startGame()
-
 document.querySelectorAll(".action").forEach(action => {
   action.addEventListener("click", () => {
-    const actionType = action.classList[1]; // np. "action1"
+    const actionType = action.classList[1];
+
+    const playerDiv = action.closest(".player");
+    const playerId = playerDiv.id;
+
+    const owner = playerId.replace("player", "");
+
+    if ("player"+owner !== tura.active.id) {
+      alert("To nie Twój żeton! Użyj swojego.");
+      return;
+    }
+
     handleAction(tura.active, actionType);
+     action.classList.add("used");
   });
 });
+
+function endRound() {
+  console.log("Runda zakończona!");
+
+  if (Rounds === 3) {
+    checkGameEnd();
+  }
+  Rounds++;
+  player1.points = 0;
+  player2.points = 0;
+
+  setTimeout(() => {
+    geishas.forEach(geisha => {
+      const gDiv = document.getElementById(`geisha${geisha.id}`);
+      if (!gDiv) {
+        console.warn(`Nie znaleziono elementu geisha${geisha.id}`);
+        return;
+      }
+
+      gDiv.classList.remove("favoredP1", "favoredP2");
+      geisha.favored = null;
+
+      const p1 = geisha.presents.player1.length;
+      const p2 = geisha.presents.player2.length;
+
+      if (p1 > p2) {
+        geisha.favored = "player1";
+        gDiv.classList.add("favoredP1");
+        player1.points += geisha.points;
+      } else if (p2 > p1) {
+        geisha.favored = "player2";
+        gDiv.classList.add("favoredP2");
+        player2.points += geisha.points;
+      }
+    });
+
+    document.querySelector("#player1 .points").textContent = `${player1.points} pkt`;
+    document.querySelector("#player2 .points").textContent = `${player2.points} pkt`;
+
+    tura.runda += 1;
+    console.log("Start nowej rundy:", tura.runda);
+
+    [player1, player2].forEach(p => {
+      p.hand = [];
+      p.usedActions = [];
+    });
+
+    deck.length = 0;
+    geishas.forEach(geisha => {
+      geisha.presents.player1 = [];
+      geisha.presents.player2 = [];
+      const gDiv = document.getElementById(`geisha${geisha.id}`);
+      gDiv.querySelector(".presentsP1").innerHTML = '';
+      gDiv.querySelector(".presentsP2").innerHTML = '';
+    });
+
+    document.querySelectorAll('.cards, .hiddenCards, #discardPile').forEach(c => c.innerHTML = '');
+
+    geishas.forEach(geisha => {
+      for (let i = 0; i < geisha.points; i++) {
+        deck.push({
+          id: `${geisha.id}-${i + 1}-r${tura.runda}`,
+          geishaId: geisha.id,
+          owner: null,
+          revealed: false
+        });
+      }
+    });
+
+    shuffle(deck);
+    const hiddenCard = deck.shift();
+    hiddenCard.revealed = false;
+
+    for (let i = 0; i < 7; i++) {
+      drawCard(player1);
+      drawCard(player2);
+    }
+
+    updateDeckCounter();
+
+    tura.active = (lastStarter === player1) ? player2 : player1;
+    lastStarter = tura.active;
+
+    updateActivePlayerHighlight();
+
+    if (tura.active === player2) {
+      setTimeout(() => botPlayTurn(), 800);
+    }
+
+    document.querySelectorAll(".action").forEach(action => action.classList.remove("used"));
+
+  }, 2000);
+}
+
+function showVictoryScreen(winnerId) {
+  const modal = document.getElementById("modal");
+  const container = document.getElementById("choiceZone") || document.querySelector(".modal-content");
+
+  modal.classList.remove("hidden");
+
+  if (winnerId === "player1") {
+    container.innerHTML = `<h2>🎉 Zwycięstwo! 🎉</h2><p>Wygrał <strong>${player1.name || "Gracz 1"}</strong>!</p>`;
+  } else if (winnerId === "player2") {
+    container.innerHTML = `<h2>🎉 Zwycięstwo! 🎉</h2><p>Wygrał <strong>${player2.name || "Gracz 2"}</strong>!</p>`;
+  } else {
+    container.innerHTML = `<h2>🤝 Remis!</h2><p>Żaden gracz nie zdobył przewagi.</p>`;
+  }
+}
+
+
+function checkGeishaMajority() {
+  let p1GeishaCount = 0;
+  let p2GeishaCount = 0;
+
+  geishas.forEach(g => {
+    if (g.favored === "player1") p1GeishaCount++;
+    else if (g.favored === "player2") p2GeishaCount++;
+  });
+
+  if (p1GeishaCount > p2GeishaCount) return showVictoryScreen("player1");
+  if (p2GeishaCount > p1GeishaCount) return showVictoryScreen("player2");
+
+  return showVictoryScreen(null);
+}
+
+
+function checkGameEnd() {
+  if (tura.runda < 3) return;
+
+  const p1Points = player1.points;
+  const p2Points = player2.points;
+
+  if (p1Points >= 11 && p2Points >= 11) {
+    return checkGeishaMajority();
+  }
+
+  if (p1Points >= 11) return showVictoryScreen("player1");
+  if (p2Points >= 11) return showVictoryScreen("player2");
+
+  return checkGeishaMajority();
+}
+
