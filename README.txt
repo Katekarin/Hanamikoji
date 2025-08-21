@@ -29,3 +29,6 @@ Ties mean the marker stays in place.
 Check for victory:
 
   If no one has won yet, a new round begins with shuffled cards.
+
+
+Update v0.2: added menu, added single player with easy bot difficulty with plays its actions randomly and rules button
