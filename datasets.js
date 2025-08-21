@@ -1,14 +1,17 @@
 const geishas = [
-  { id: 1, name: "Geisha 1", points: 2, presents: { player1: [], player2: [] } },
-  { id: 2, name: "Geisha 2", points: 2, presents: { player1: [], player2: [] } },
-  { id: 3, name: "Geisha 3", points: 2, presents: { player1: [], player2: [] } },
-  { id: 4, name: "Geisha 4", points: 3, presents: { player1: [], player2: [] } },
-  { id: 5, name: "Geisha 5", points: 3, presents: { player1: [], player2: [] } },
-  { id: 6, name: "Geisha 6", points: 4, presents: { player1: [], player2: [] } },
-  { id: 7, name: "Geisha 7", points: 5, presents: { player1: [], player2: [] } },
+  { id: 1, name: "Geisha 1", points: 2, presents: { player1: [], player2: [] }, favored: null },
+  { id: 2, name: "Geisha 2", points: 2, presents: { player1: [], player2: [] }, favored: null },
+  { id: 3, name: "Geisha 3", points: 2, presents: { player1: [], player2: [] }, favored: null },
+  { id: 4, name: "Geisha 4", points: 3, presents: { player1: [], player2: [] }, favored: null },
+  { id: 5, name: "Geisha 5", points: 3, presents: { player1: [], player2: [] }, favored: null },
+  { id: 6, name: "Geisha 6", points: 4, presents: { player1: [], player2: [] }, favored: null },
+  { id: 7, name: "Geisha 7", points: 5, presents: { player1: [], player2: [] }, favored: null },
 ];
 
 const deck = [];
+let Rounds = 1;
+let isSinglePlayer = false;
+let botDifficulty = null;
 
 geishas.forEach(geisha => {
   for (let i = 0; i < geisha.points; i++) {
@@ -26,6 +29,12 @@ const player1 = {
   hand: [],
   points: 0,
   usedActions: [],
+  actions: [
+    { id: 1, name: "Discard 2 cards" },
+    { id: 2, name: "Gift 1 card" },
+    { id: 3, name: "Offer 2 piles" },
+    { id: 4, name: "Keep 1, reveal rest" }
+]
 };
 
 const player2 = {
@@ -33,8 +42,18 @@ const player2 = {
   hand: [],
   points: 0,
   usedActions: [],
+  actions: [
+    { id: 1, name: "Discard 2 cards" },
+    { id: 2, name: "Gift 1 card" },
+    { id: 3, name: "Offer 2 piles" },
+    { id: 4, name: "Keep 1, reveal rest" }
+]
 };
 
+let tura = {
+    runda: 0,
+    active:player1,
+}
 
 function renderGeishasWithImages(containerId) {
   const container = document.getElementById(containerId);
@@ -47,16 +66,13 @@ function renderGeishasWithImages(containerId) {
       return;
     }
 
-    // Tworzymy i dodajemy obrazek gejszy
-    const img = document.createElement('img');
-    img.src = `graphic/geishe/geisha${geisha.id}.jpg`;  // Dopasuj ścieżkę do swoich folderów
-    img.alt = geisha.name;
-    img.classList.add('geisha-img'); // opcjonalna klasa do stylowania
-
-    geishaDiv.appendChild(img);
+    geishaDiv.style.backgroundImage = `url('graphic/geishe/geisha${geisha.id}.jpg')`;
+    geishaDiv.style.backgroundSize = 'cover';
+    geishaDiv.style.backgroundPosition = 'center';
+    geishaDiv.style.backgroundRepeat = 'no-repeat';
   });
 }
 
-
-
 renderGeishasWithImages('geishe'); 
+
+let lastStarter = player2;
