@@ -4,40 +4,90 @@
   <meta charset="UTF-8">
   <title>Hanamikoji</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap" rel="stylesheet">
+
 </head>
 <body>
 
-<div id="table">
+<div id="menuScreen">
+  <h1 class="menu-title">🎴 Hanamikoji</h1>
+  <p class="menu-subtitle">Inaczej Gejsze</p>
+  <button id="btnHotseat" class="menu-btn">Hotseat</button>
+  <button id="btnSingle" class="menu-btn">Single Player</button>
+  <button id="rulesButton" class="menu-btn">Zasady</button>
 
-  <!-- Gracz 1 -->
+</div>
+
+<div id="difficultyScreen" class="hidden">
+  <h2 class="menu-title">Wybierz poziom trudności</h2>
+  <div class="difficulty-buttons">
+    <button class="menu-btn btnDifficulty" data-level="easy">Łatwy</button>
+    <button class="menu-btn btnDifficulty" data-level="medium">Średni</button>
+    <button class="menu-btn btnDifficulty" data-level="hard">Trudny</button>
+    <button id="backToMenu" class="back-btn">⟵ Back to Menu</button>
+  </div>
+</div>
+
+<canvas id="sakuraCanvas"></canvas>
+
+<!-- Zasady -->
+<div id="rulesModal" class="modal hidden">
+  <div class="modal-content">
+    <span id="closeRules" class="close">&times;</span>
+    <h2>Zasady Gry</h2>
+    <p>
+        In *Hanamikoji*, two players compete to win the favor of seven renowned geishas by collecting their preferred items.<br><br>
+        
+        <strong>Objective:</strong><br>
+        Win by either:<br>
+        – Gaining the favor of 4 geishas, or<br>
+        – Collecting 11 or more points in total.<br><br>
+
+        <strong>Gameplay:</strong><br>
+        The game is played in rounds. Each round, players alternate turns using their 4 special actions. Each action can only be used once per round.<br><br>
+
+        <strong>Actions:</strong><br>
+        1️⃣ Discard 2 cards face-down (removed from the round).<br>
+        2️⃣ Give 1 card face-up to in front of You (You immediately place it at the end of round on the matching geisha).<br>
+        3️⃣ Secretly divide 4 cards into 2 piles. Your opponent chooses 1 pile, the other is yours.<br>
+        4️⃣ Choose 3 cards, play 2 of them, and give 1 to your opponent.<br><br>
+
+        <strong>End of Round:</strong><br>
+        – Both players reveal their secret kept cards.<br>
+        – Check each geisha: whoever offered more gifts gains her favor token.<br>
+        – Victory is declared if a player meets the winning condition. Otherwise, shuffle and play a new round.<br><br>
+
+        Balance your choices wisely – every action helps your opponent as much as yourself!
+      </p>
+  </div>
+</div>
+
+<!-- Gra -->
+<div id="table" class="hidden">
+
   <div id="player1" class="player">
-    <div class="hiddenCards"></div>
+    <div class="hiddenCards revised"></div>
 
     <div class="actions">
-      <div class="action action1">Oddaj</div>
+      <div class="action action1">Prezent</div>
       <div class="action action2">Odrzuć</div>
       <div class="action action3">Podziel</div>
-      <div class="action action4">podział</div>
+      <div class="action action4">Podział</div>
     </div>
 
     <div class="cards">
-      <!-- Przykładowe karty -->
     </div>
 
     <div class="points">0 pkt</div>
   </div>
 
-  <!-- Centrum stołu -->
   <div id="center">
 
-    <!-- Talia kart -->
     <div id="deck">
-      <div id="deckCounter">deck counter</div>
+      <div id="deckCounter" class="revised">deck counter</div>
     </div>
 
-    <!-- Gejsze -->
     <div id="geishe">
-      <!-- 7 gejsz -->
       <div class="geisha" id="geisha1">
         <div class="presentsP1"></div>
         <div class="presentsPoints">2</div>
@@ -75,26 +125,18 @@
       </div>
     </div>
 
-    <!-- Stos odrzuconych kart -->
-    <div id="discardPile">Odrzut</div>
+    <div id="discardPile" class="revised">Odrzut</div>
   </div>
 
-  <div id="endTurn">
-  <button onclick="endTurn()">Zakończ turę</button>
-</div>
-
-
-  <!-- Gracz 2 -->
   <div id="player2" class="player">
-    <div class="hiddenCards"></div>
+    <div class="hiddenCards revised"></div>
 
     <div class="actions">
-      <div class="action action1">Zachowaj 1</div>
-      <div class="action action2">Odrzuć 1</div>
-      <div class="action action3">Podział 2/2</div>
-      <div class="action action4">Podział 3/1</div>
+      <div class="action action1">Prezent</div>
+      <div class="action action2">Odrzuć</div>
+      <div class="action action3">Podziel</div>
+      <div class="action action4">Podział</div>
     </div>
-
 
     <div class="cards">
 
@@ -110,6 +152,11 @@
 </div>
 
 </body>
+<script src="menu.js"></script>
 <script src="datasets.js"></script>
+<script src="actions.js"></script>
 <script src="scripts.js"></script>
+<script src="rules.js"></script>
+
+<script src="easyBot.js"></script>
 </html>
