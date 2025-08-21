@@ -1,34 +1,36 @@
-/* Reset i ogólne ustawienia */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
 }
 
 body {
-  background-color: #e27012;
-  padding: 1%;
+  background-color: #f1f5e6;
+  color: #333;
+  padding: 1vw;
+  font-family: 'Noto Serif JP', serif;
 }
 
-/* Układ ogólny graczy */
-#player1,
-#player2 {
-  display: flex;
-  justify-content: space-between;
+#table {
+  max-width: 100vw;
+  margin: 1vh auto;
+}
+
+.player {
+  display: grid;
+  grid-template-columns: 5vw 40vw 2fr auto;
   align-items: center;
-  margin: 5% auto;
-  padding: 1%;
-  border: 2px solid #999;
-  background-color: #fc0075;
-  width: 90vw;
-  height: 120px;
+  margin: 2rem auto;
+  padding: 1rem;
+  background-color: #ffe4e1;
+  border-color: #c9a0dc;
+  border: 2px solid;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
 .hiddenCards {
-  display: flex;
-  width: 60px;
-  height: 90px;
+
   background-color: #494949;
   border: 1px solid #000;
 }
@@ -43,92 +45,36 @@ body {
   top: -50px;
 }
 
-/* Akcje */
 .actions {
   display: flex;
-  left:-20px;
   gap: 10px;
-  margin: 10px 0 10px -150px;
-  width: 27.5%;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 25vw;
 }
 
-.actions > .action {
+.action {
   width: 75px;
   height: 75px;
-  background-color: #f0c040;
-  border: 2px solid #444;
+  background-color: #ffb347;
+  border-color: #8b5c00;
+  border: 2px solid;
   text-align: center;
   line-height: 75px;
   font-weight: bold;
+  cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.actions > .action:hover {
+.action:hover {
   transform: scale(1.05);
   box-shadow: 0 0 10px #0005;
-  cursor: pointer;
 }
 
-/* Centrum */
-#center {
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  border: 1px dotted #000;
-  padding: 20px 0;
-}
-
-/* Gejsze */
-#geishe {
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  margin: 20px 0;
-  padding: 10px;
-  width: 80%;
-  background-color: #723700;
-  border: 2px solid #492300;
-}
-
-.geisha {
-  border: 2px solid #333;
-  padding: 10px;
-  width: 11%;
-  text-align: center;
-  background-color: #fff;
-}
-
-.geisha > div {
-  margin: 5px 0;
-  min-height: 30px;
-  border: 1px dashed #aaa;
-  padding: 4px;
-}
-
-/* Talia i odrzutki */
-#deck,
-#discardPile {
-  display: inline-block;
-  width: 100px;
-  height: 150px;
-  border: 2px solid #555;
-  background-color: #ddd;
-  margin: 10px;
-  text-align: center;
-  line-height: 150px;
-  font-weight: bold;
-}
-
-#deckCounter {
-  font-size: 1.5em;
-}
-
-/* Karty */
 .cards {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
   min-height: 90px;
 }
 
@@ -136,6 +82,9 @@ body {
   width: 60px;
   height: 90px;
   background-color: #fff;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  font-family: 'Georgia', serif;
   border: 1px solid #000;
   text-align: center;
   line-height: 90px;
@@ -149,85 +98,84 @@ body {
   cursor: pointer;
 }
 
-/* Punkty */
-.points {
-  font-size: 1.2em;
-  font-weight: bold;
-  margin-left: 10px;
-}
-
-/* Przycisk Koniec tury */
-#endTurn {
-  text-align: center;
-  margin: 30px 0;
-}
-
-#endTurn button {
-  background-color: #c00;
-  color: #fff;
-  padding: 10px 25px;
-  font-size: 1em;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-#endTurn button:hover {
-  background-color: #900;
-}
-
-.activePlayer {
-  outline: 4px solid pink;
-}
-
 .card.selectable {
   outline: 3px solid #00f;
 }
 
-#discardPile .card {
-  width: 60px;
-  height: 90px;
-  background-color: #333;
-  border: 1px solid #000;
-  margin: 2px;
-  display: inline-block;
+.points {
+  font-size: 1.4em;
+  font-weight: bold;
+  color: #8b0000;
+  background-color: #ffe;
+  padding: 4px 8px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 4px rgba(0,0,0,0.1);
+}
+
+
+#center {
+  display: grid;
+  grid-template-columns: 6vw 1fr 6vw;
+  gap: 1vw;
+  align-items: start;
+  margin: auto;
+  padding: 2rem 1rem;
+  border: 1px dotted #000;
+  max-width: 100%;
+  align-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+  height:50vh;
+}
+
+#deck, #discardPile {
+  border: 2px solid #555;
+  background-color: #ddd;
+  text-align: center;
+  font-weight: bold;
 }
 
 #geishe {
-  display: flex;
-  gap: 10px; /* odstęp między gejszami */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(5vw, 1fr));
+  padding: 1vw;
+  background-color: #723700;
+  border: 2px solid #492300;
+  width: 95%;
+  justify-content: center;
+  margin: 1vw auto;
+  flex-wrap: wrap;
 }
 
 .geisha {
-  position: relative;
-  width: 120px; /* dostosuj szerokość */
-  height: 180px; /* dostosuj wysokość */
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  overflow: hidden;
-  background-color: #fefefe;
+  width: 180px;
+  height: 280px;
+  background-color: #fffaf0;
+  border-color: #deb887;
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
+  text-align: center;
 }
 
-.geisha-img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+.geisha > div {
+  border: 1px dashed #aaa;
+  padding: 4px;
+  min-height: 30px;
+  width: 100%;
 }
 
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.6);
+  display: hidden;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
@@ -235,19 +183,21 @@ body {
   display: none;
 }
 
-.modal-content {
-  background-color: #fff;
+.modal-content, #choiceZone {
+  background: white;
   padding: 20px;
+  border-radius: 8px;
   display: flex;
   gap: 20px;
-  border-radius: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
 .stackChoice {
-  border: 2px solid #999;
+  border: 2px solid #aaa;
   padding: 10px;
+  background: #eee;
   cursor: pointer;
-  background-color: #eee;
 }
 
 .stackChoice:hover {
@@ -263,3 +213,205 @@ body {
   margin: 2px;
 }
 
+.activePlayer {
+  animation: pulse 2s infinite;
+  outline: 4px solid #ffc0cb;
+}
+
+@keyframes pulse {
+  0% { outline-color: #ffc0cb; }
+  50% { outline-color: #ff69b4; }
+  100% { outline-color: #ffc0cb; }
+}
+
+#discardPile {
+  position: relative;
+  border: 2px solid #555;
+  background-color: #ddd;
+  margin: 10px;
+  text-align: center;
+  line-height: 150px;
+  font-weight: bold;
+}
+
+#discardPile .card {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 60px;
+  height: 90px;
+  background-color: #333;
+  border: 1px solid #000;
+  transform: translate(0, 0);
+}
+
+.geisha.favoredP1 {
+  box-shadow: 0 -12px 12px rgba(0,0,255,0.5);
+}
+
+.geisha.favoredP2 {
+  box-shadow: 0 12px 12px rgba(255,0,0,0.5);
+}
+
+.presentsPoints {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #b04c4c;
+}
+
+.presentsP1, .presentsP2 {
+  min-height: 40px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.presentsP1 .gift, .presentsP2 .gift {
+  width: 30px;
+  height: 40px;
+  border-radius: 5px;
+}
+
+.revised{
+  width:4vw;
+  height:12vh;
+}
+
+.action.used {
+  background-color: #222;
+  color: #ddd;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hidden {
+  display: none;
+}
+
+#menuScreen, #difficultyScreen {
+  text-align: center;
+  margin-top: 50px;
+}
+
+#menuScreen button, #difficultyScreen button {
+  font-size: 1.2rem;
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+}
+
+
+body {
+  font-family: 'Noto Serif JP', serif;
+  margin: 0;
+  background: linear-gradient(135deg, #fff8f0 0%, #ffe6ea 100%);
+  color: #4a2e2a;
+}
+
+.menu-title {
+  font-size: 3rem;
+  margin-bottom: 10px;
+  color: #b80f28;
+  text-shadow: 0px 0px 5px rgba(184, 15, 40, 0.4);
+}
+
+.menu-subtitle {
+  font-size: 1.2rem;
+  margin-bottom: 30px;
+  color: #7a5a4f;
+}
+
+#menuScreen, #difficultyScreen {
+  text-align: center;
+  padding-top: 100px;
+  animation: fadeIn 1s ease;
+}
+
+.menu-btn {
+  background: #b80f28;
+  color: #fff;
+  border: none;
+  padding: 15px 40px;
+  font-size: 1.2rem;
+  margin: 15px;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0px 5px 15px rgba(184, 15, 40, 0.3);
+}
+
+.menu-btn:hover {
+  background: #d81b38;
+  box-shadow: 0px 8px 20px rgba(184, 15, 40, 0.4);
+  transform: scale(1.05);
+}
+
+.difficulty-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+#sakuraCanvas {
+  position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -1;
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  max-width: 600px;
+  max-height: 80%;
+  overflow-y: auto;
+  box-shadow: 0 0 15px rgba(0,0,0,0.5);
+}
+
+.close {
+  float: right;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.back-btn {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  background: #a33;
+  color: #fff;
+  font-size: 16px;
+  padding: 8px 14px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+.back-btn:hover {
+  background: #c44;
+}
