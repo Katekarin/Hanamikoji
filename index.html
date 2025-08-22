@@ -11,22 +11,37 @@
 
 <div id="menuScreen">
   <h1 class="menu-title">🎴 Hanamikoji</h1>
-  <p class="menu-subtitle">Inaczej Gejsze</p>
+  <p class="menu-subtitle">Geishas</p>
   <button id="btnHotseat" class="menu-btn">Hotseat</button>
   <button id="btnSingle" class="menu-btn">Single Player</button>
-  <button id="rulesButton" class="menu-btn">Zasady</button>
-
+  <button id="rulesButton" class="menu-btn">Rules</button>
 </div>
 
 <div id="difficultyScreen" class="hidden">
-  <h2 class="menu-title">Wybierz poziom trudności</h2>
+  <h2 class="menu-title">Choose difficulty level</h2>
   <div class="difficulty-buttons">
-    <button class="menu-btn btnDifficulty" data-level="easy">Łatwy</button>
-    <button class="menu-btn btnDifficulty" data-level="medium">Średni</button>
-    <button class="menu-btn btnDifficulty" data-level="hard">Trudny</button>
     <button id="backToMenu" class="back-btn">⟵ Back to Menu</button>
+    <button class="menu-btn btnDifficulty" data-level="easy">Easy</button>
+    <button class="menu-btn btnDifficulty" data-level="medium">Normal</button>
+    <button class="menu-btn btnDifficulty" data-level="hard">Hard</button>
   </div>
 </div>
+
+<!-- przycisk Patchnotes w menu -->
+<button id="patchnotesButton" class="patch-btn">📜 Patchnotes</button>
+
+<!-- Modal z patchnotes -->
+<div id="patchnotesModal" class="hidden modal">
+  <div class="modal-content">
+    <span id="closePatchnotes" class="close">&times;</span>
+    <h2>Patchnotes</h2>
+    <ul>
+      <li><b>v1.0a - 21.08.2025</b><br> – Initial release first version</li>
+      <li><b>v1.1a - 22.08.2025</b><br> – Fixed language issues. everything is engish now! <br> fixes workining of gift. <br> reworked graphic slighty. will be improved later</li>
+    </ul>
+  </div>
+</div>
+
 
 <canvas id="sakuraCanvas"></canvas>
 
@@ -34,7 +49,7 @@
 <div id="rulesModal" class="modal hidden">
   <div class="modal-content">
     <span id="closeRules" class="close">&times;</span>
-    <h2>Zasady Gry</h2>
+    <h2>Rules</h2>
     <p>
         In *Hanamikoji*, two players compete to win the favor of seven renowned geishas by collecting their preferred items.<br><br>
         
@@ -47,10 +62,10 @@
         The game is played in rounds. Each round, players alternate turns using their 4 special actions. Each action can only be used once per round.<br><br>
 
         <strong>Actions:</strong><br>
-        1️⃣ Discard 2 cards face-down (removed from the round).<br>
-        2️⃣ Give 1 card face-up to in front of You (You immediately place it at the end of round on the matching geisha).<br>
-        3️⃣ Secretly divide 4 cards into 2 piles. Your opponent chooses 1 pile, the other is yours.<br>
-        4️⃣ Choose 3 cards, play 2 of them, and give 1 to your opponent.<br><br>
+        1️⃣ Give 1 card face-up to in front of You (You immediately place it at the end of round on the matching geisha).<br>
+        2️⃣ Discard 2 cards face-down (removed from the round).<br>
+        3️⃣ Choose 3 cards, play 2 of them, and give 1 to your opponent.<br>
+        4️⃣ Secretly divide 4 cards into 2 piles. Your opponent chooses 1 pile, the other is yours.<br><br>
 
         <strong>End of Round:</strong><br>
         – Both players reveal their secret kept cards.<br>
@@ -69,16 +84,16 @@
     <div class="hiddenCards revised"></div>
 
     <div class="actions">
-      <div class="action action1">Prezent</div>
-      <div class="action action2">Odrzuć</div>
-      <div class="action action3">Podziel</div>
-      <div class="action action4">Podział</div>
+      <div class="action action1">Gift</div>
+      <div class="action action2">Discard</div>
+      <div class="action action3">Divine</div>
+      <div class="action action4">give2Get</div>
     </div>
 
     <div class="cards">
     </div>
 
-    <div class="points">0 pkt</div>
+    <div class="points">0 points</div>
   </div>
 
   <div id="center">
@@ -125,18 +140,19 @@
       </div>
     </div>
 
-    <div id="discardPile" class="revised">Odrzut</div>
+    <div id="discardPile" class="revised">Discard</div>
   </div>
 
   <div id="player2" class="player">
     <div class="hiddenCards revised"></div>
 
     <div class="actions">
-      <div class="action action1">Prezent</div>
-      <div class="action action2">Odrzuć</div>
-      <div class="action action3">Podziel</div>
-      <div class="action action4">Podział</div>
+      <div class="action action1">Gift</div>
+      <div class="action action2">Discard</div>
+      <div class="action action3">Divine</div>
+      <div class="action action4">give2Get</div>
     </div>
+
 
     <div class="cards">
 
@@ -156,7 +172,6 @@
 <script src="datasets.js"></script>
 <script src="actions.js"></script>
 <script src="scripts.js"></script>
-<script src="rules.js"></script>
 
 <script src="easyBot.js"></script>
 </html>
