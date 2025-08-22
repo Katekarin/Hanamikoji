@@ -1,4 +1,3 @@
-// MENU
 const menuScreen = document.getElementById("menuScreen");
 const difficultyScreen = document.getElementById("difficultyScreen");
 const tableScreen = document.getElementById("table");
@@ -7,21 +6,22 @@ const backToMenuBtn = document.getElementById("backToMenu");
 document.getElementById("btnHotseat").addEventListener("click", () => {
   menuScreen.classList.add("hidden");
   tableScreen.classList.remove("hidden");
-  startGame(); // tryb hotseat
+  tableScreen.style.display = "flex"; // Upewnij się, że ekran stołu jest widoczny
+  startGame();
 });
 
 document.getElementById("btnSingle").addEventListener("click", () => {
   menuScreen.classList.add("hidden");
   difficultyScreen.classList.remove("hidden");
+  backToMenuBtn.classList.remove("hidden"); // <<< tu pokazujemy
 });
 
-backToMenu.addEventListener("click", () => {
+backToMenuBtn.addEventListener("click", () => {
   difficultyScreen.classList.add("hidden");
   menuScreen.classList.remove("hidden");
-  backToMenu.classList.add("hidden"); 
+  backToMenuBtn.classList.add("hidden"); // <<< chowamy po powrocie
 });
 
-// wybór poziomu trudności
 document.querySelectorAll(".btnDifficulty").forEach(btn => {
   btn.addEventListener("click", () => {
     const level = btn.dataset.level;
@@ -30,19 +30,16 @@ document.querySelectorAll(".btnDifficulty").forEach(btn => {
     difficultyScreen.classList.add("hidden");
     tableScreen.classList.remove("hidden");
 
-    // tu możesz ustawić zmienną np. botDifficulty = level;
     startGameSingle(level);
+    backToMenuBtn.classList.add("hidden"); // <<< chowamy w samej rozgrywce
+    tableScreen.style.display = "flex"; // Upewnij się, że ekran stołu jest widoczny
   });
 });
 
-function startGameSingle(level) {
-  console.log("Start gry single player. Poziom trudności:", level);
-
-  startGame();
-}
 
 
-// Sakura płatki
+// Animacja płatków sakury w tle
+
 const canvas = document.getElementById('sakuraCanvas');
 const ctx = canvas.getContext('2d');
 let petals = [];
@@ -98,13 +95,13 @@ function animate() {
 
 animate();
 
-// pokaż przycisk kiedy gra się uruchomi
 function startSinglePlayer() {
   startGame("single");
   backToMenuBtn.classList.remove("hidden");
 }
 
-// otwieranie i zamykanie modala zasad
+
+// Modal z zasadami gry
 const rulesButton = document.getElementById("rulesButton");
 const rulesModal = document.getElementById("rulesModal");
 const closeRules = document.getElementById("closeRules");
@@ -115,4 +112,17 @@ rulesButton.addEventListener("click", () => {
 
 closeRules.addEventListener("click", () => {
   rulesModal.classList.add("hidden");
+});
+
+// patchnoty
+const patchnotesButton = document.getElementById("patchnotesButton");
+const patchnotesModal = document.getElementById("patchnotesModal");
+const closePatchnotes = document.getElementById("closePatchnotes");
+
+patchnotesButton.addEventListener("click", () => {
+  patchnotesModal.classList.remove("hidden");
+});
+
+closePatchnotes.addEventListener("click", () => {
+  patchnotesModal.classList.add("hidden");
 });
