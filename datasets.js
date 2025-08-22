@@ -12,6 +12,7 @@ const deck = [];
 let Rounds = 1;
 let isSinglePlayer = false;
 let botDifficulty = null;
+RoundsLimit = 3;
 
 geishas.forEach(geisha => {
   for (let i = 0; i < geisha.points; i++) {
@@ -74,5 +75,6 @@ function renderGeishasWithImages(containerId) {
 }
 
 renderGeishasWithImages('geishe'); 
+
 
 let lastStarter = player2;
