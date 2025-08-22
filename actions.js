@@ -1,6 +1,5 @@
 function handleKeepOne(player, selectedCards) {
   if (!selectedCards) {
-    // tryb gracza
     return selectCards(player, 1, (cards) => handleKeepOne(player, cards));
   }
 
@@ -72,7 +71,7 @@ function handleSplitTwoTwo(player, selectedCards) {
     return;
   }
 
-  showModal(container, "Przeciwnik wybiera jeden ze stosów:");
+  showModal(container, "Choose 1 pile:");
   stacks.forEach((stack, index) => {
     const stackDiv = document.createElement("div");
     stackDiv.classList.add("stackChoice");
