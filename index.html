@@ -1,177 +1,63 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
-  <meta charset="UTF-8">
-  <title>Hanamikoji</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP&display=swap" rel="stylesheet">
+function botPlayTurn() {
+  console.log("Bot gra turę.");
 
-</head>
-<body>
+  // Dostępne akcje bota (po nazwach)
+  let available = player2.actions
+    .map(a => a.name) // pobieramy tylko nazwy
+    .filter(name => !player2.usedActions.includes(name));
 
-<div id="menuScreen">
-  <h1 class="menu-title">🎴 Hanamikoji</h1>
-  <p class="menu-subtitle">Geishas</p>
-  <button id="btnHotseat" class="menu-btn">Hotseat</button>
-  <button id="btnSingle" class="menu-btn">Single Player</button>
-  <button id="rulesButton" class="menu-btn">Rules</button>
-</div>
+  if (available.length === 0) {
+    console.warn("Bot nie ma już dostępnych akcji.");
+    return;
+  }
 
-<div id="difficultyScreen" class="hidden">
-  <h2 class="menu-title">Choose difficulty level</h2>
-  <div class="difficulty-buttons">
-    <button id="backToMenu" class="back-btn">⟵ Back to Menu</button>
-    <button class="menu-btn btnDifficulty" data-level="easy">Easy</button>
-    <button class="menu-btn btnDifficulty" data-level="medium">Normal</button>
-    <button class="menu-btn btnDifficulty" data-level="hard">Hard</button>
-  </div>
-</div>
+  // Losowa akcja
+  const action = available[Math.floor(Math.random() * available.length)];
+  console.log("Bot wybrał akcję:", action);
 
-<!-- przycisk Patchnotes w menu -->
-<button id="patchnotesButton" class="patch-btn">📜 Patchnotes</button>
+  // Losuje n kart z ręki
+  function pickRandomCards(player, n) {
+    const handCopy = [...player.hand];
+    const picked = [];
+    for (let i = 0; i < n && handCopy.length > 0; i++) {
+      const idx = Math.floor(Math.random() * handCopy.length);
+      picked.push(handCopy.splice(idx, 1)[0]);
+    }
+    // Usuwamy z ręki
+    picked.forEach(card => {
+      const index = player.hand.indexOf(card);
+      if (index !== -1) player.hand.splice(index, 1);
+    });
+    return picked;
+  }
 
-<!-- Modal z patchnotes -->
-<div id="patchnotesModal" class="hidden modal">
-  <div class="modal-content">
-    <span id="closePatchnotes" class="close">&times;</span>
-    <h2>Patchnotes</h2>
-    <ul>
-      <li><b>v1.0a - 21.08.2025</b><br> – Initial release first version</li>
-      <li><b>v1.1a - 22.08.2025</b><br> – Fixed language issues. everything is engish now! <br> fixes workining of gift. <br> reworked graphic slighty. will be improved later</li>
-    </ul>
-  </div>
-</div>
+  // easyBot.js
+window.easyBot = {
+  botChooseStack(player, stacks) {
+    return Math.random() > 0.5 ? 0 : 1;
+  }
+};
 
 
-<canvas id="sakuraCanvas"></canvas>
+  // Obsługa akcji
+  switch (action) {
+    case "Discard 2 cards":
+      handleDiscardTwo(player2, pickRandomCards(player2, 2));
+      break;
 
-<!-- Zasady -->
-<div id="rulesModal" class="modal hidden">
-  <div class="modal-content">
-    <span id="closeRules" class="close">&times;</span>
-    <h2>Rules</h2>
-    <p>
-        In *Hanamikoji*, two players compete to win the favor of seven renowned geishas by collecting their preferred items.<br><br>
-        
-        <strong>Objective:</strong><br>
-        Win by either:<br>
-        – Gaining the favor of 4 geishas, or<br>
-        – Collecting 11 or more points in total.<br><br>
+    case "Gift 1 card":
+      handleSplitThreeOne(player2, pickRandomCards(player2, 3));
+      break;
 
-        <strong>Gameplay:</strong><br>
-        The game is played in rounds. Each round, players alternate turns using their 4 special actions. Each action can only be used once per round.<br><br>
+    case "Offer 2 piles":
+      handleSplitTwoTwo(player2, pickRandomCards(player2, 4));
+      break;
 
-        <strong>Actions:</strong><br>
-        1️⃣ Give 1 card face-up to in front of You (You immediately place it at the end of round on the matching geisha).<br>
-        2️⃣ Discard 2 cards face-down (removed from the round).<br>
-        3️⃣ Choose 3 cards, play 2 of them, and give 1 to your opponent.<br>
-        4️⃣ Secretly divide 4 cards into 2 piles. Your opponent chooses 1 pile, the other is yours.<br><br>
+    case "Keep 1, reveal rest":
+      handleKeepOne(player2, pickRandomCards(player2, 1));
+      break;
+  }
 
-        <strong>End of Round:</strong><br>
-        – Both players reveal their secret kept cards.<br>
-        – Check each geisha: whoever offered more gifts gains her favor token.<br>
-        – Victory is declared if a player meets the winning condition. Otherwise, shuffle and play a new round.<br><br>
+  player2.usedActions.push(action);
 
-        Balance your choices wisely – every action helps your opponent as much as yourself!
-      </p>
-  </div>
-</div>
-
-<!-- Gra -->
-<div id="table" class="hidden">
-
-  <div id="player1" class="player">
-    <div class="hiddenCards revised"></div>
-
-    <div class="actions">
-      <div class="action action1">Gift</div>
-      <div class="action action2">Discard</div>
-      <div class="action action3">Divine</div>
-      <div class="action action4">give2Get</div>
-    </div>
-
-    <div class="cards">
-    </div>
-
-    <div class="points">0 points</div>
-  </div>
-
-  <div id="center">
-
-    <div id="deck">
-      <div id="deckCounter" class="revised">deck counter</div>
-    </div>
-
-    <div id="geishe">
-      <div class="geisha" id="geisha1">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">2</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha2">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">2</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha3">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">2</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha4">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">3</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha5">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">3</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha6">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">4</div>
-        <div class="presentsP2"></div>
-      </div>
-      <div class="geisha" id="geisha7">
-        <div class="presentsP1"></div>
-        <div class="presentsPoints">5</div>
-        <div class="presentsP2"></div>
-      </div>
-    </div>
-
-    <div id="discardPile" class="revised">Discard</div>
-  </div>
-
-  <div id="player2" class="player">
-    <div class="hiddenCards revised"></div>
-
-    <div class="actions">
-      <div class="action action1">Gift</div>
-      <div class="action action2">Discard</div>
-      <div class="action action3">Divine</div>
-      <div class="action action4">give2Get</div>
-    </div>
-
-
-    <div class="cards">
-
-    </div>
-
-    <div class="points">0 pkt</div>
-  </div>
-
-</div>
-
-<div id="modal" class="modal hidden">
-  <div class="modal-content" id="choiceZone"></div>
-</div>
-
-</body>
-<script src="menu.js"></script>
-<script src="datasets.js"></script>
-<script src="actions.js"></script>
-<script src="scripts.js"></script>
-
-<script src="easyBot.js"></script>
-</html>
+}
