@@ -1,0 +1,96 @@
+window.mediumBot = {
+  botPlayTurn() {
+    console.log("Medium bot gra turę.");
+
+    // Lista dostępnych akcji
+    const available = player2.actions
+      .map(a => a.name)
+      .filter(name => !player2.usedActions.includes(name));
+
+    if (available.length === 0) {
+      console.warn("Bot nie ma już dostępnych akcji.");
+      return;
+    }
+
+    // Funkcja losowego wyboru kart
+    const pickRandomCards = (player, n) => {
+      const handCopy = [...player.hand];
+      const picked = [];
+      for (let i = 0; i < n && handCopy.length > 0; i++) {
+        const idx = Math.floor(Math.random() * handCopy.length);
+        picked.push(handCopy.splice(idx, 1)[0]);
+      }
+      picked.forEach(card => {
+        const index = player.hand.indexOf(card);
+        if (index !== -1) player.hand.splice(index, 1);
+      });
+      return picked;
+    };
+
+    // Ocena gejsz – tylko własne karty bota
+    const botGeishaCounts = geishas.map(g => {
+      return {
+        id: g.id,
+        count: g.presents.player2.length
+      };
+    });
+
+    // Najlepsza gejsza to ta, gdzie bot ma najmniej kart
+    const geishaToFavor = botGeishaCounts
+      .sort((a, b) => a.count - b.count)
+      .filter(g => g.count < Math.ceil(g.points / 2))[0];
+
+// Lista akcji poza discard
+const preferredActions = available.filter(a => a !== "Discard 2 cards");
+
+// Wybór akcji logiczny
+let action;
+
+if (preferredActions.includes("Gift 1 card") && canGiftToSomeGeisha()) {
+  action = "Gift 1 card";
+} else if (preferredActions.includes("Offer 2 piles")) {
+  action = "Offer 2 piles";
+} else if (preferredActions.includes("Keep 1, reveal rest")) {
+  action = "Keep 1, reveal rest";
+} else if (available.includes("Discard 2 cards")) {
+  action = "Discard 2 cards"; // tylko wtedy, gdy nic innego nie da się zrobić
+}
+
+    console.log("Medium bot wybiera akcję:", action);
+
+    // Obsługa akcji
+    switch (action) {
+      case "Discard 2 cards":
+        handleDiscardTwo(player2, pickRandomCards(player2, 2));
+        break;
+
+      case "Gift 1 card":
+        const cardToGift = pickRandomCards(player2, 1);
+        handleSplitThreeOne(player2, [cardToGift[0], cardToGift[0], cardToGift[0]]); // uproszczone dla medium
+        break;
+
+      case "Offer 2 piles":
+        handleSplitTwoTwo(player2, pickRandomCards(player2, 4));
+        break;
+
+      case "Keep 1, reveal rest":
+        handleKeepOne(player2, pickRandomCards(player2, 1));
+        break;
+    }
+
+    player2.usedActions.push(action);
+  },
+
+  botChooseStack(player, stacks) {
+    // Wybiera stos, który minimalizuje własne ryzyko (stos z mniej jego kartami)
+    const stackScores = stacks.map(stack => {
+      return stack.reduce((acc, card) => {
+        const g = geishas.find(g => g.id === card.geishaId);
+        return acc + g.presents.player2.length;
+      }, 0);
+    });
+
+    const minScore = Math.min(...stackScores);
+    return stackScores.indexOf(minScore);
+  }
+};
