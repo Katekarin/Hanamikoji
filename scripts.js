@@ -26,8 +26,6 @@ function renderCardToHand(playerId, card) {
   handDiv.appendChild(cardDiv);
 }
 
-
-
 function updateDeckCounter() {
   const counter = document.getElementById("deckCounter");
   counter.textContent = deck.length;
@@ -62,13 +60,14 @@ function selectCards(player, numberToSelect, callback) {
       if (selected.includes(index)) return;
 
       cardDiv.style.outline = '3px solid #0f0';
+      cardDiv.style.animation = 'jump 0.3s ease forwards';
       selected.push(index);
 
       if (selected.length === numberToSelect) {
         cards.forEach(c => {
           c.classList.remove('selectable');
           c.style.outline = '';
-          c.replaceWith(c.cloneNode(true)); // usunięcie eventów
+          c.replaceWith(c.cloneNode(true));
         });
 
         callback(selected.map(i => player.hand[i]));
@@ -92,56 +91,78 @@ function endTurn() {
   }
 
   if (isSinglePlayer && tura.active === player2) {
-    setTimeout(botPlayTurn, 500);
+    setTimeout(botPlayTurn, 500); 
   }
 }
 
 
 function startGameSingle(level) {
   console.log("Start gry single player. Poziom trudności:", level);
-  isSinglePlayer = true;
-  botDifficulty = level;
-  startGame();
+
+  isSinglePlayer = true;         // ustaw tryb single
+  botDifficulty = level;         // zapisz poziom trudności bota
+
+  startGame();                   // uruchom grę normalnie
+  backToMenuBtn.classList.remove("hidden"); // pokaż przycisk powrotu
 }
+
 
 
 function startGame(mode) {
   shuffle(deck);
 
+  // Usuń jedną zakrytą kartę z gry
   const hiddenCard = deck.shift();
   hiddenCard.revealed = false;
   hiddenCard.owner = null;
   console.log("Usunięto jedną zakrytą kartę z gry.");
 
+  // Rozdaj karty (7 dla każdego gracza)
   for (let i = 0; i < 7; i++) {
     drawCard(player1);
     drawCard(player2);
   }
 
+  // Ustawienia początkowe rundy
   tura.runda = 1;
 
   if (mode === 'singlePlayer') {
+    // Player1 jako bot, player2 jako gracz
     player1.isBot = true;
     player2.isBot = false;
+
+    // Wybór aktywnego gracza na start (tutaj bot)
     tura.active = player1;
+
+    // Można też ustawić poziom trudności bota
+    botDifficulty = "medium"; // albo "easy", zależnie od wyboru
   } else {
+    // Hotseat – obaj gracze ludzie
     player1.isBot = false;
     player2.isBot = false;
     tura.active = player1;
   }
 
+  // Odśwież UI
   updateDeckCounter();
   updateActivePlayerHighlight();
 
+  // Jeśli bot zaczyna, uruchom jego turę po krótkim opóźnieniu
   if (tura.active.isBot) {
-    setTimeout(() => botTurn(), 1000);
+    setTimeout(() => {
+      if (botDifficulty === "easy") {
+        window.easyBot.botPlayTurn();
+      } else if (botDifficulty === "medium") {
+        window.mediumBot.botPlayTurn();
+      }
+    }, 1000);
   } else {
     console.log("Rozpoczęto grę. Gracz 1 zaczyna.");
   }
-  console.log("Talia start nowej rundy:", deck.length);
-console.log("Ręka P1:", player1.hand.length);
-console.log("Ręka P2:", player2.hand.length);
 
+  console.log("Talia start nowej rundy:", deck.length);
+  console.log("Ręka P1:", player1.hand.length);
+  console.log("Ręka P2:", player2.hand.length);
 }
 
 
@@ -164,7 +185,6 @@ function redrawHand(player, hideCards = false) {
   });
 }
 
-
 function assignCardToGeisha(card, playerId) {
   const geisha = geishas.find(g => g.id === card.geishaId);
   if (!geisha) return;
@@ -180,11 +200,15 @@ function assignCardToGeisha(card, playerId) {
 
   const targetZone = geishaDiv.querySelector(playerId === "player1" ? ".presentsP1" : ".presentsP2");
   const present = document.createElement("div");
-  present.classList.add("present");
+  present.classList.add("present", "added"); // klasa added do animacji
   present.textContent = "🎁";
 
   targetZone.appendChild(present);
+
+  // Usuwamy klasę animacji po zakończeniu, żeby można było ją powtarzać
+  setTimeout(() => present.classList.remove("added"), 500);
 }
+
 
 function showModal(container, message) {
   const modal = document.getElementById("modal");
@@ -214,19 +238,19 @@ function handleAction(player, actionType) {
   }
 
   switch (actionType) {
-    case "action1": // Zachowaj 1
+    case "action1":
       handleKeepOne(player)
       console.log('action1')
       break;
-    case "action2": // Odrzuć 2
+    case "action2":
       handleDiscardTwo(player)
       console.log('action2')
       break;
-    case "action3": // Podział 2/2
+    case "action3": 
       handleSplitTwoTwo(player)
       console.log('action3')
       break;
-    case "action4": // Podział 2/1
+    case "action4": 
       handleSplitThreeOne(player);
       console.log('action4');
       break;
@@ -235,7 +259,6 @@ function handleAction(player, actionType) {
   player.usedActions.push(actionType);  
 
 }
-
 
 function updateActivePlayerHighlight() {
   document.querySelectorAll('.player').forEach(p => p.classList.remove('activePlayer'));
@@ -264,9 +287,30 @@ document.querySelectorAll(".action").forEach(action => {
 function endRound() {
   console.log("Runda zakończona!");
 
-  if (Rounds === 3) {
+  if (Rounds === RoundsLimit) {
     checkGameEnd();
   }
+
+  // 🔹 Odkrycie ukrytych kart (Keep 1)
+[player1, player2].forEach(player => {
+  const hiddenCards = player.hand.filter(c => !c.revealed);
+  hiddenCards.forEach(card => {
+    card.revealed = true;
+    assignCardToGeisha(card, player.id); // przypisanie do odpowiedniej gejszy
+
+    // pokazanie karty w UI
+    const hiddenZone = document.querySelector(`#${player.id} .hiddenCards`);
+    const cardDiv = document.createElement("div");
+    cardDiv.classList.add("card");
+    cardDiv.textContent = `G${card.geishaId}`;
+    hiddenZone.appendChild(cardDiv);
+  });
+
+  // usunięcie ukrytych kart z ręki
+  player.hand = player.hand.filter(c => c.revealed);
+});
+
+
   Rounds++;
   player1.points = 0;
   player2.points = 0;
@@ -369,7 +413,6 @@ function showVictoryScreen(winnerId) {
   }
 }
 
-
 function checkGeishaMajority() {
   let p1GeishaCount = 0;
   let p2GeishaCount = 0;
@@ -379,12 +422,10 @@ function checkGeishaMajority() {
     else if (g.favored === "player2") p2GeishaCount++;
   });
 
-  if (p1GeishaCount > p2GeishaCount) return showVictoryScreen("player1");
-  if (p2GeishaCount > p1GeishaCount) return showVictoryScreen("player2");
-
-  return showVictoryScreen(null);
+  if (p1GeishaCount > p2GeishaCount) {return showVictoryScreen("player1");}
+  else if (p2GeishaCount > p1GeishaCount) {return showVictoryScreen("player2");}
+  else {  return Rounds.limit++;}
 }
-
 
 function checkGameEnd() {
   if (tura.runda < 3) return;
